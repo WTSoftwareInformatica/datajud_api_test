@@ -3,8 +3,17 @@ import 'dart:async';
 import 'package:http/http.dart' as http;
 
 class DataJudApiService {
+
+  final apiKey =
+      'APIKey cDZHYzlZa0JadVREZDJCendQbXY6SkJlTzNjLV9TRENyQk1RdnFKZGRQdw==';
+
+  /*
+  Exemplo de dados reais
+  TJES, processo nº 00013659120188080024
+   */
+
   Future<http.Response> buscaDadosProcesso(
-      String endPoint, String apiKey, String processNumber) async {
+      String endPoint, String processNumber) async {
     final headers = {
       "Authorization": apiKey,
       "Content-Type": "application/json"
