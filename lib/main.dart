@@ -1,4 +1,5 @@
-import 'package:datajud_api_test/Data/dados.dart';
+import 'package:datajud_api_test/Data/mock_data.dart';
+import 'package:datajud_api_test/Widgets/custom_textfield.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
 import 'dart:convert';
@@ -7,17 +8,8 @@ import 'package:http/http.dart' as http;
 
 import 'Data/endpoints.dart';
 import 'Data/tritunais.dart';
+import 'Models/processo.dart';
 import 'Services/datajud_api_service.dart';
-import 'Widgets/customWidgets.dart';
-
-String dropdownValue = listaTribunais[listaTribunais.indexOf('TRF1')];
-
-/*
-const apiKey =
-    'APIKey cDZHYzlZa0JadVREZDJCendQbXY6SkJlTzNjLV9TRENyQk1RdnFKZGRQdw==';
-
- */
-var endPoint = endPoints['TRF1'];
 
 void main() {
   runApp(const MyApp());
@@ -31,7 +23,6 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return const MaterialApp(
@@ -59,21 +50,46 @@ class _MyHomePageState extends State<MyHomePage> {
   final _controllerAssuntoNome = TextEditingController();
   final _controllerOrgaoJulgador = TextEditingController();
   final _controllerdataAjuizamento = TextEditingController();
-  DateFormat dateFormat = DateFormat("yyyy-MM-ddTHH:mm:ss");
 
+  DateFormat dateFormat = DateFormat("yyyy-MM-ddTHH:mm:ss");
+  bool _isVisibleDetals = false;
+  late String _endPoint;
+  late String _dropdownValue;
+  final _listaMovimentos = [];
+
+  // Lê da mock database - apenas para testes sem consulta à API
   Future buscaDadosProntos() async {
-    return resposta['movimentos'];
+    return MockData().respostaOk['movimentos'];
   }
 
-  final listaMovimentos = [];
+  void cleanControllers() {
+    _isVisibleDetals = false;
+    _controller.text = '00130759020004013800';
+    _controllerDtHoraUltAutual.text = '';
+    _controllerTribunal.text = '';
+    _controllerClasseNome.text = '';
+    _controllerAssuntoNome.text = '';
+    _controllerOrgaoJulgador.text = '';
+    _controllerdataAjuizamento.text = '';
+    _listaMovimentos.clear();
+  }
 
   @override
   Widget build(BuildContext context) {
-    _controller.text = '00130759020004013800';
 
     return SafeArea(
       child: myOldScaffold(),
     );
+  }
+
+  @override
+  void initState() {
+    // Temporário para testes
+    _endPoint = endPoints['TRF1'];
+    _controller.text = '00130759020004013800';
+    _dropdownValue = listaTribunais[listaTribunais.indexOf('TRF1')];
+    //
+    super.initState();
   }
 
   Widget myOldScaffold() {
@@ -93,7 +109,7 @@ class _MyHomePageState extends State<MyHomePage> {
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
                 SizedBox(
-                  width: 500,
+                  width: 450,
                   child: ListTile(
                     leading: SizedBox(
                       width: 300,
@@ -105,12 +121,13 @@ class _MyHomePageState extends State<MyHomePage> {
                   ),
                 ),
                 DropdownMenu<String>(
-                  initialSelection:
-                      listaTribunais[listaTribunais.indexOf('TRF1')],
+                  width: 450,
+//                  initialSelection: listaTribunais.first,
+                  // Temporário para testes
+                  initialSelection:listaTribunais[listaTribunais.indexOf('TRF1')],
                   onSelected: (String? value) {
-                    // This is called when the user selects an item.
                     setState(() {
-                      dropdownValue = value!;
+                      _dropdownValue = value!;
                     });
                   },
                   dropdownMenuEntries: listaTribunais
@@ -122,7 +139,7 @@ class _MyHomePageState extends State<MyHomePage> {
               ],
             ),
             const SizedBox(
-              height: 15,
+              height: 45,
             ),
             Expanded(
               child: myColumn(),
@@ -136,17 +153,18 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget myElevatedButton() {
     return ElevatedButton(
         onPressed: () async {
-          endPoint = endPoints[dropdownValue];
-          if (_controller.text.isNotEmpty) {
-            http.Response response = await DataJudApiService()
-                .buscaDadosProcesso(
-                    endPoint, _controller.text..padLeft(20, '0'));
-            setState(() {
-              listaMovimentos.clear();
+          _endPoint = endPoints[_dropdownValue];
+          http.Response response = await DataJudApiService().buscaDadosProcesso(
+              _endPoint, _controller.text..padLeft(20, '0'));
+          setState(() {
+            cleanControllers();
+            if (json.decode(response.body)['hits']['total']['value'] != 0) {
+              Processo processo = Processo.fromJson(json.decode(response.body)['hits']['hits'][0]['_source']);
+              print('NumeroProcesso: ${processo.numeroProcesso}');
               if (json.decode(response.body)['hits']['hits'][0]['_source']
                       ['movimentos'] !=
                   null) {
-                listaMovimentos.addAll(json.decode(response.body)['hits']
+                _listaMovimentos.addAll(json.decode(response.body)['hits']
                     ['hits'][0]['_source']['movimentos']);
               }
               _controllerDtHoraUltAutual.text =
@@ -154,7 +172,8 @@ class _MyHomePageState extends State<MyHomePage> {
                       json.decode(response.body)['hits']['hits'][0]['_source']
                           ['dataHoraUltimaAtualizacao']));
               _controllerTribunal.text =
-                  '${json.decode(response.body)['hits']['hits'][0]['_source']['tribunal']} - ${tribunais[json.decode(response.body)['hits']['hits'][0]['_source']['tribunal']].toString()}';
+                  '${json.decode(response.body)['hits']['hits'][0]['_source']['tribunal']} - '
+                  '${tribunais[json.decode(response.body)['hits']['hits'][0]['_source']['tribunal']].toString()}';
               _controllerClasseNome.text = json.decode(response.body)['hits']
                   ['hits'][0]['_source']['classe']['nome'];
               _controllerAssuntoNome.text = json.decode(response.body)['hits']
@@ -165,8 +184,9 @@ class _MyHomePageState extends State<MyHomePage> {
                   DateFormat('dd-MM-yyyy – HH:mm ').format(dateFormat.parse(
                       json.decode(response.body)['hits']['hits'][0]['_source']
                           ['dataAjuizamento']));
-            });
-          }
+              _isVisibleDetals = true;
+            }
+          });
         },
         child: const SizedBox(
           width: 80,
@@ -180,72 +200,76 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   Widget myColumn() {
-    return Column(
-      children: [
-        Row(
-          children: [
-            Expanded(
-              child: Card(
-                elevation: 3,
-                color: Colors.white,
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Column(
-                    children: [
-                      customTextField('Tribunal', _controllerTribunal),
-                      customTextField('Assunto', _controllerAssuntoNome),
-                      customTextField('Classe', _controllerClasseNome),
-                      customTextField(
-                          'Órgão Julgador', _controllerOrgaoJulgador),
-                      customTextField(
-                          'Último Ajuizamento', _controllerdataAjuizamento),
-                      customTextField(
-                          'Última Autalização', _controllerDtHoraUltAutual),
-                    ],
+    return (!_isVisibleDetals)
+        ? const SizedBox(
+            width: 10,
+          )
+        : Column(
+            children: [
+              Row(
+                children: [
+                  Expanded(
+                    child: Card(
+                      elevation: 3,
+                      color: Colors.white,
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Column(
+                          children: [
+                            CustomTextfield('Tribunal', _controllerTribunal),
+                            CustomTextfield('Assunto', _controllerAssuntoNome),
+                            CustomTextfield('Classe', _controllerClasseNome),
+                            CustomTextfield(
+                                'Órgão Julgador', _controllerOrgaoJulgador),
+                            CustomTextfield('Último Ajuizamento',
+                                _controllerdataAjuizamento),
+                            CustomTextfield('Última Autalização',
+                                _controllerDtHoraUltAutual),
+                          ],
+                        ),
+                      ),
+                    ),
                   ),
-                ),
-              ),
-            ),
-            Expanded(
-              child: Card(
-                elevation: 3,
-                color: Colors.white,
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Column(
-                    children: [
-                      const Text('Movimentos'),
-                      //myFutureBuilder(),
-                      myListaMovimentos(),
-                    ],
+                  Expanded(
+                    child: Card(
+                      elevation: 3,
+                      color: Colors.white,
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Column(
+                          children: [
+                            const Text('Movimentos'),
+                            //myFutureBuilder(),
+                            myListaMovimentos(),
+                          ],
+                        ),
+                      ),
+                    ),
                   ),
-                ),
+                ],
               ),
-            ),
-          ],
-        ),
-      ],
-    );
+            ],
+          );
   }
 
   Widget myListaMovimentos() {
     return Column(
       children: [
         SizedBox(
-          width: 550,
-          height: 480,
+          width: 500,
+          height: 270,
           child: ListView.builder(
-            itemCount: listaMovimentos.length,
+            itemCount: _listaMovimentos.length,
             shrinkWrap: true,
             //physics: const NeverScrollableScrollPhysics(),
             itemBuilder: (context, index) {
               return ListTile(
                 title: Text(DateFormat('dd-MM-yyyy – HH:mm').format(
-                    dateFormat.parse(listaMovimentos[index]['dataHora']))),
-                subtitle: Text(listaMovimentos[index]['nome'] ?? ''),
+                    dateFormat.parse(_listaMovimentos[index]['dataHora']))),
+                subtitle: Text(_listaMovimentos[index]['nome'] ?? ''),
                 trailing:
-                    (listaMovimentos[index]['complementosTabelados'] != null)
-                        ? Text(listaMovimentos[index]['complementosTabelados']
+                    (_listaMovimentos[index]['complementosTabelados'] != null)
+                        ? Text(_listaMovimentos[index]['complementosTabelados']
                             [0]['nome'])
                         : const Text('Sem complementos Tabelados'),
                 //title: Text(listaMovimentos[index]),

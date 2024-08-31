@@ -1,26 +1,4 @@
-import 'dart:convert';
-import 'package:http/http.dart' as http;
-
-void tryWelcome() async {}
-/* // teste que preencheu welcome
-                            http.Response response = await DataJudApiService()
-                                .buscaDadosProcesso(
-                                    endPoint, apiKey, _controller.text);
-                            var mapa = json.decode(response.body)['hits']
-                                ['hits'][0]['_source'];
-                            welcome = welcomeFromJson(json.encode(mapa));
-
- */
-
-// To parse this JSON data, do
-//
-//     final welcome = welcomeFromJson(jsonString);
-
-Welcome welcomeFromJson(String str) => Welcome.fromJson(json.decode(str));
-
-String welcomeToJson(Welcome data) => json.encode(data.toJson());
-
-class Welcome {
+class Processo {
   String? numeroProcesso;
   Classe? classe;
   Classe? sistema;
@@ -36,7 +14,7 @@ class Welcome {
   OrgaoJulgador? orgaoJulgador;
   List<Classe>? assuntos;
 
-  Welcome({
+  Processo({
     this.numeroProcesso,
     this.classe,
     this.sistema,
@@ -53,7 +31,7 @@ class Welcome {
     this.assuntos,
   });
 
-  factory Welcome.fromJson(Map<String, dynamic> json) => Welcome(
+  factory Processo.fromJson(Map<String, dynamic> json) => Processo(
         numeroProcesso: json["numeroProcesso"],
         classe: json["classe"] == null ? null : Classe.fromJson(json["classe"]),
         sistema:
