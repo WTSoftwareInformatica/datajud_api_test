@@ -12,7 +12,7 @@ class Processo {
   String? id;
   int? nivelSigilo;
   OrgaoJulgador? orgaoJulgador;
-  List<Classe>? assuntos;
+  List<Assunto>? assuntos;
 
   Processo({
     this.numeroProcesso,
@@ -60,8 +60,8 @@ class Processo {
             : OrgaoJulgador.fromJson(json["orgaoJulgador"]),
         assuntos: json["assuntos"] == null
             ? []
-            : List<Classe>.from(
-                json["assuntos"]!.map((x) => Classe.fromJson(x))),
+            : List<Assunto>.from(
+            json["assuntos"]!.map((x) => Assunto.fromJson(x))),
       );
 
   Map<String, dynamic> toJson() => {
@@ -107,11 +107,36 @@ class Classe {
       };
 }
 
-class Movimento {
+class Assunto {
+  int? codigo;
+  String? nome;
+
+  Assunto({
+    this.codigo,
+    this.nome,
+  });
+
+  factory Assunto.fromJson(Map<String, dynamic> json) => Assunto(
+    codigo: json["codigo"],
+    nome: json["nome"],
+  );
+
+  Map<String, dynamic> toJson() => {
+    "codigo": codigo,
+    "nome": nome,
+  };
+}
+
+class Movimento implements Comparable<Movimento>{
   List<ComplementosTabelado>? complementosTabelados;
   int? codigo;
   String? nome;
   DateTime? dataHora;
+
+  @override
+  int compareTo(Movimento other) {
+    return this.dataHora!.compareTo(other.dataHora!);
+  }
 
   Movimento({
     this.complementosTabelados,
@@ -139,6 +164,7 @@ class Movimento {
         "nome": nome,
         "dataHora": dataHora?.toIso8601String(),
       };
+
 }
 
 class ComplementosTabelado {
