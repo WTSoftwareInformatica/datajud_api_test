@@ -29,8 +29,9 @@ class DataJudApiService {
     try {
       http.Response response = await DataJudApiService()
           .postApi(endPoint, numeroProcesso..padLeft(20, '0'));
+      final decodedResponse = utf8.decode(response.bodyBytes);
       processo = Processo.fromJson(
-          json.decode(response.body)['hits']['hits'][0]['_source']);
+          json.decode(decodedResponse)['hits']['hits'][0]['_source']);
     } catch (e) {
       processo = Processo();
     }

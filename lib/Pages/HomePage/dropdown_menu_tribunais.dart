@@ -3,27 +3,20 @@ import 'package:flutter/material.dart';
 
 import '../../Models/tribunais.dart';
 
-class DropdownMenuTribunais extends StatefulWidget {
+class DropdownMenuTribunais extends StatelessWidget {
   final TextEditingController controller;
   final void Function(String? value) onSelected;
   const DropdownMenuTribunais({super.key, required this.controller, required this.onSelected});
 
   @override
-  State<DropdownMenuTribunais> createState() => _DropdownMenuTribunaisState();
-}
-
-class _DropdownMenuTribunaisState extends State<DropdownMenuTribunais> {
-
-
-  @override
   Widget build(BuildContext context) {
     return DropdownMenu<String>(
-      controller: widget.controller,
+      controller: controller,
       width: 450,
       menuHeight: 250,
       initialSelection: '',
       onSelected: (String? value) {
-        widget.onSelected(value);
+        onSelected(value);
       },
       dropdownMenuEntries: TribunaisService()
           .getListaTribunais()

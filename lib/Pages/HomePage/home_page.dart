@@ -1,10 +1,12 @@
 import 'package:datajud_api_test/Pages/HomePage/dropdown_menu_tribunais.dart';
+import 'package:datajud_api_test/Widgets/custom_progressIndicator.dart';
 import 'package:flutter/material.dart';
 import 'package:datajud_api_test/Widgets/custom_textfield.dart';
 import 'package:intl/intl.dart';
 import '../../Models/processo.dart';
 import '../../Services/datajud_api_service.dart';
 import '../../Services/endpoints_service.dart';
+import '../../Services/tribunais_service.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key, required this.title});
@@ -46,9 +48,12 @@ class _HomePageState extends State<HomePage> {
 
   void _fillControllers(Processo processo) {
     try {
+      final tribunaisService = TribunaisService();
       _controllerDtHoraUltAutual.text = DateFormat('dd-MM-yyyy – HH:mm ')
           .format(processo.dataHoraUltimaAtualizacao!);
-      _controllerTribunal.text = processo.tribunal.toString();
+      String siglaTribunal = processo.tribunal.toString();
+      String nomeTribunal = tribunaisService.getNomeTribunal(processo.tribunal.toString());
+      _controllerTribunal.text = '$siglaTribunal - $nomeTribunal';
       _controllerInstancia.text = processo.grau.toString();
       _controllerClasseNome.text = processo.classe!.nome.toString();
       _controllerAssuntoNome.text =
@@ -138,11 +143,7 @@ class _HomePageState extends State<HomePage> {
                   searchBarDesktop(),
                   const SizedBox(height: 10),
                   (_isLoading)
-                      ? SizedBox(
-                          height: (MediaQuery.sizeOf(context).height / 5) * 3,
-                          child:
-                              const Center(child: CircularProgressIndicator()),
-                        )
+                      ? const CustomProgressIndicator()
                       : Row(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
@@ -157,20 +158,16 @@ class _HomePageState extends State<HomePage> {
                   children: [
                     searchBarSmart(),
                     (_isLoading)
-                        ? SizedBox(
-                            height: (MediaQuery.sizeOf(context).height / 5) * 3,
-                            child: const Center(
-                                child: CircularProgressIndicator()),
-                          )
+                        ? const CustomProgressIndicator()
                         : Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            const SizedBox(height: 10),
-                            leftControls(),
-                            const SizedBox(height: 10),
-                            rightControls(),
-                          ],
-                        )
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const SizedBox(height: 10),
+                              leftControls(),
+                              const SizedBox(height: 10),
+                              rightControls(),
+                            ],
+                          )
                   ],
                 );
               }
