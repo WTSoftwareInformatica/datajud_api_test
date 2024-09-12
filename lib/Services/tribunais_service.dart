@@ -2,13 +2,14 @@
 import '../Models/tribunais.dart';
 
 class TribunaisService {
+  Tribunais tribunais = Tribunais();
 
   String getNomeTribunal(String nomeTribunal) {
-    return Tribunais().tribunais[nomeTribunal];
+    return tribunais.tribunais[nomeTribunal];
   }
 
   List<dynamic> getListaTribunais() {
-    return Tribunais().listaTribunais;
+    return tribunais.listaTribunais;
 }
 
 }

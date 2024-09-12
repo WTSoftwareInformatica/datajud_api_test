@@ -1,8 +1,6 @@
 import 'package:datajud_api_test/Services/tribunais_service.dart';
 import 'package:flutter/material.dart';
 
-import '../../Models/tribunais.dart';
-
 class DropdownMenuTribunais extends StatelessWidget {
   final TextEditingController controller;
   final void Function(String? value) onSelected;
@@ -10,6 +8,7 @@ class DropdownMenuTribunais extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final tribunaisService = TribunaisService();
     return DropdownMenu<String>(
       controller: controller,
       width: 450,
@@ -18,8 +17,7 @@ class DropdownMenuTribunais extends StatelessWidget {
       onSelected: (String? value) {
         onSelected(value);
       },
-      dropdownMenuEntries: TribunaisService()
-          .getListaTribunais()
+      dropdownMenuEntries: tribunaisService.getListaTribunais()
           .map<DropdownMenuEntry<String>>((dynamic value) {
         return DropdownMenuEntry<String>(
             style: MenuItemButton.styleFrom(
@@ -27,7 +25,7 @@ class DropdownMenuTribunais extends StatelessWidget {
             ),
             value: value,
 //            label: '$value - ${Tribunais().tribunais[value]}');
-            label: '$value - ${TribunaisService().getNomeTribunal(value)}');
+            label: '$value - ${tribunaisService.getNomeTribunal(value)}');
       }).toList(),
     );
   }

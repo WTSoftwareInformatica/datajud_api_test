@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'dart:async';
 import 'package:http/http.dart' as http;
 
-import '../Models/processo.dart';
+import '../Models/processo/processo.dart';
 
 class DataJudApiService {
   final apiKey =
@@ -27,8 +27,8 @@ class DataJudApiService {
       String endPoint, String numeroProcesso) async {
     Processo processo;
     try {
-      http.Response response = await DataJudApiService()
-          .postApi(endPoint, numeroProcesso..padLeft(20, '0'));
+      http.Response response =
+          await postApi(endPoint, numeroProcesso..padLeft(20, '0'));
       final decodedResponse = utf8.decode(response.bodyBytes);
       processo = Processo.fromJson(
           json.decode(decodedResponse)['hits']['hits'][0]['_source']);
