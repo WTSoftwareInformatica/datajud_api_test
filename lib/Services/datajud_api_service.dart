@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'dart:async';
 import 'package:http/http.dart' as http;
 
-import '../Models/processo/processo.dart';
+import '../Models/processo/processo_model.dart';
 
 class DataJudApiService {
   final apiKey =
@@ -23,15 +23,20 @@ class DataJudApiService {
     return response;
   }
 
-  Future<Processo> buscaDadosProcesso(
-      String endPoint, String numeroProcesso) async {
+  Future<Processo> buscaApiData(
+      String endPoint, String numeroProcesso, int index) async {
     Processo processo;
     try {
       http.Response response =
           await postApi(endPoint, numeroProcesso..padLeft(20, '0'));
       final decodedResponse = utf8.decode(response.bodyBytes);
-      processo = Processo.fromJson(
-          json.decode(decodedResponse)['hits']['hits'][0]['_source']);
+      if (json.decode(decodedResponse)['hits']['total']['value'] > 0) {
+        processo = Processo.fromJson(
+            json.decode(decodedResponse)['hits']['hits'][index]['_source']);
+      } else {
+        processo = Processo();
+        print('Numero processo else: ${processo.numeroProcesso}');
+      }
     } catch (e) {
       processo = Processo();
     }
@@ -42,6 +47,9 @@ class DataJudApiService {
 /*
 
   Exemplo de dados reais
+
+  TRF1, processo nº 00130759020004013800
   TJES, processo nº 00013659120188080024
+  TJES, processo nº 00227832220178080024
 
 */

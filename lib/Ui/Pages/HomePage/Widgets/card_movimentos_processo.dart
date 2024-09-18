@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
-import '../../../Models/processo/processo_state.dart';
-import '../../../Models/processo/processo_store.dart';
+import '../../../../Models/processo/processo_state.dart';
+import '../../../../Models/processo/processo_store.dart';
 
 class CardMovimentosProcesso extends StatelessWidget {
   const CardMovimentosProcesso({super.key});

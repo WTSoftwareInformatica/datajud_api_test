@@ -1,7 +1,8 @@
+import 'package:datajud_api_test/Models/Tribunal/tribunal_store.dart';
 import 'package:datajud_api_test/Models/processo/processo_store.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'Pages/HomePage/home_page.dart';
+import 'Ui/Pages/HomePage/home_page.dart';
 
 class MyApp extends StatefulWidget {
   const MyApp({super.key});

@@ -1,4 +1,4 @@
-import 'package:datajud_api_test/Models/processo/processo.dart';
+import 'package:datajud_api_test/Models/processo/processo_model.dart';
 
 abstract class ProcessoState {}
 

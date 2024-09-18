@@ -15,21 +15,41 @@ class Processo {
   List<Assunto>? assuntos;
 
   Processo({
-    this.numeroProcesso,
+    this.numeroProcesso = '',
     this.classe,
     this.sistema,
     this.formato,
-    this.tribunal,
+    this.tribunal = '',
     this.dataHoraUltimaAtualizacao,
-    this.grau,
+    this.grau = '',
     this.timestamp,
     this.dataAjuizamento,
-    this.movimentos,
-    this.id,
+    this.movimentos = const [],
+    this.id = '',
     this.nivelSigilo,
     this.orgaoJulgador,
-    this.assuntos,
+    this.assuntos = const [],
   });
+
+/*
+  factory Processo.empty(Processo processo) => Processo(
+      numeroProcesso: '',
+      classe: null,
+      sistema: null,
+      formato: null,
+      tribunal: '',
+      dataHoraUltimaAtualizacao: null,
+      grau: '',
+      timestamp: null,
+      dataAjuizamento: null,
+      movimentos: const [],
+      id: '',
+      nivelSigilo: null,
+      orgaoJulgador: null,
+      assuntos: const []
+  );
+
+ */
 
   factory Processo.fromJson(Map<String, dynamic> json) => Processo(
         numeroProcesso: json["numeroProcesso"],
@@ -85,6 +105,7 @@ class Processo {
             ? []
             : List<dynamic>.from(assuntos!.map((x) => x.toJson())),
       };
+
 }
 
 class Classe {

@@ -16,14 +16,18 @@ class ProcessoStore extends ValueNotifier<ProcessoState> {
     numeroProcesso = newValue;
   }
 
-  Future fetchProcesso() async {
+  Future fetchProcesso(int index) async {
     value = LoadingProcessoState();
     notifyListeners();
     await Future.delayed((const Duration(seconds: 1)));
     try {
       final processo =
-          await dataJudApiService.buscaDadosProcesso(endPoint, numeroProcesso);
-      value = SuccessProcessoState(processo);
+          await dataJudApiService.buscaApiData(endPoint, numeroProcesso, index);
+      if (processo.numeroProcesso != '') {
+        value = SuccessProcessoState(processo);
+      } else {
+        value = ErrorProcessoState('Processo não encontrado');
+      }
       notifyListeners();
     } catch (e) {
       value = ErrorProcessoState(e.toString());

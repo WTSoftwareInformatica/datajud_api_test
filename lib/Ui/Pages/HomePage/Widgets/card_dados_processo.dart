@@ -1,20 +1,20 @@
-import 'package:datajud_api_test/Services/tribunais_service.dart';
+import 'package:datajud_api_test/Ui/Pages/HomePage/home_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
-import '../../../Models/processo/processo_state.dart';
-import '../../../Models/processo/processo_store.dart';
+import '../../../../Models/processo/processo_state.dart';
+import '../../../../Models/processo/processo_store.dart';
 import '../../../Widgets/custom_textformfield.dart';
 
 class CardDadosProcesso extends StatelessWidget {
-  const CardDadosProcesso({super.key});
+  final HomeController homeController;
+  const CardDadosProcesso({super.key, required this.homeController});
 
   @override
   Widget build(BuildContext context) {
     final processoStore = context.watch<ProcessoStore>();
     final state = processoStore.value;
-    final tribunaisService = TribunaisService();
     Widget? child;
 
     if (state is SuccessProcessoState) {
@@ -33,7 +33,7 @@ class CardDadosProcesso extends StatelessWidget {
               CustomTextFormField(
                 label: 'Tribunal',
                 text:
-                    '$siglaTribunal - ${tribunaisService.getNomeTribunal(siglaTribunal)}',
+                    '$siglaTribunal - ${homeController.nomeTribunal(siglaTribunal)}',
               ),
               CustomTextFormField(
                 label: 'Instância',

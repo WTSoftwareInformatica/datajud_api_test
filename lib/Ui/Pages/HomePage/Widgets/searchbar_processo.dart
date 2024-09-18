@@ -1,18 +1,21 @@
 import 'package:flutter/material.dart';
-import 'package:datajud_api_test/Pages/HomePage/home_controller.dart';
+import 'package:datajud_api_test/Ui/Pages/HomePage/home_controller.dart';
 import 'dropdown_menu_tribunais.dart';
 
 class SearchbarProcesso extends StatelessWidget {
-  const SearchbarProcesso({super.key});
+  const SearchbarProcesso({super.key, required this.homeController});
+
+  final HomeController homeController;
 
   @override
   Widget build(BuildContext context) {
-    HomeController homeController = HomeController(context);
     Widget dropDownTribunais() {
       return Expanded(
         child: DropdownMenuTribunais(
-            controller: homeController.dropDownController,
-            onSelected: homeController.dropDownMenuChange),
+          controller: homeController.dropDownController,
+          onSelected: homeController.dropDownMenuChange,
+          homeController: homeController,
+        ),
       );
     }
 
@@ -26,9 +29,7 @@ class SearchbarProcesso extends StatelessWidget {
       return ElevatedButton(
           onPressed: () {
             if (homeController.toSearchController.text.isNotEmpty) {
-              homeController.dadosProcesso(
-                  homeController.dropDownController.text,
-                  homeController.toSearchController.text);
+              homeController.dadosProcesso();
             }
           },
           child: const Text('Busca'));
@@ -68,7 +69,7 @@ class SearchbarProcesso extends StatelessWidget {
                   tjesButton(),
                 ])
           : SizedBox(
-              height: 150,
+              height: 180,
               child: Column(
                   mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.start,
